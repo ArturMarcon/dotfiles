@@ -1,0 +1,11 @@
+module FrierenBar
+singleton Theme 1.0 Theme.qml
+FrierenBar 1.0 FrierenBar.qml
+WorkspacesModule 1.0 WorkspacesModule.qml
+ClockModule 1.0 ClockModule.qml
+MediaModule 1.0 MediaModule.qml
+AudioModule 1.0 AudioModule.qml
+BatteryModule 1.0 BatteryModule.qml
+TrayModule 1.0 TrayModule.qml
+PowerModule 1.0 PowerModule.qml
+GrimoireLauncher 1.0 GrimoireLauncher.qml

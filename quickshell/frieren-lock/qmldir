@@ -1,0 +1,3 @@
+module FrierenLock
+singleton Theme 1.0 Theme.qml
+LockScreen 1.0 LockScreen.qml

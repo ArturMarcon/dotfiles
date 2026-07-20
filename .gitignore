@@ -1,0 +1,33 @@
+# Ignore everything in ~/.config by default to prevent system state/caches from being committed
+/*
+
+# Always include this .gitignore file
+!/.gitignore
+
+# Whiltelist user customizations and dotfiles
+!/hypr/
+!/quickshell/
+!/fish/
+!/kitty/
+!/gtk-3.0/
+!/starship.toml
+!/dolphinrc
+!/pavucontrol.ini
+
+# Explicitly exclude known non-customization/state directories (redundant with /*, but kept for clarity)
+/Antigravity IDE/
+/btop/
+/dconf/
+/gh/
+/matplotlib/
+/mozilla/
+/pulse/
+/session/
+
+# Within whitelisted directories, ignore backup, temporary, and state files
+*.bak
+*.swp
+*~
+*.log
+*.tdb
+cookie
