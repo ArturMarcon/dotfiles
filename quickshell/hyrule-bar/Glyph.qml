@@ -38,7 +38,10 @@ Item {
         "prev":        { s: "M6.5 6v12", f: "M18.5 5.5v13L9 12z" },
         "next":        { s: "M17.5 6v12", f: "M5.5 5.5v13L15 12z" },
         "play":        { s: "", f: "M7.5 4.5v15L19.5 12z" },
-        "pause":       { s: "", f: "M6.5 5h4v14h-4z M13.5 5h4v14h-4z" }
+        "pause":       { s: "", f: "M6.5 5h4v14h-4z M13.5 5h4v14h-4z" },
+        "gpu":         { s: "M3 6.5h15.5v11H3z M18.5 9h2.5 M18.5 15h2.5 M6.5 17.5v3 M10.5 17.5v3 M14.5 17.5v3", f: "M7.5 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0" },
+        "memory":      { s: "M3.5 7h17v9h-17z M6 16v3 M10 16v3 M14 16v3 M18 16v3", f: "M6.5 10h3v3h-3z M10.5 10h3v3h-3z M14.5 10h3v3h-3z" },
+        "thermo":      { s: "M10 14.5V5.5a2 2 0 0 1 4 0v9", f: "M8.5 16.5a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0" }
     })
     readonly property var icon: icons[name] || { s: "", f: "" }
 

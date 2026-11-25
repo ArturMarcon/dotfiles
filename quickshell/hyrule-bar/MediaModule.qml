@@ -1,8 +1,8 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Mpris
 
+// Now playing, as plain floating text; controls appear on hover.
 Item {
     id: mediaRoot
 
@@ -11,97 +11,74 @@ Item {
     property bool hasMedia: activePlayer !== null && (activePlayer.isPlaying || activePlayer.trackTitle !== "")
 
     visible: hasMedia
-    implicitWidth: hasMedia ? mediaPanel.width : 0
-    implicitHeight: Theme.pillHeight
+    implicitWidth: hasMedia ? row.implicitWidth : 0
+    implicitHeight: Theme.slotSize
     width: implicitWidth
     height: implicitHeight
 
-    HudPanel {
-        id: mediaPanel
-        width: mediaRow.implicitWidth + 22
-        Behavior on width { NumberAnimation { duration: Theme.animDurationNormal; easing.type: Easing.OutCubic } }
-        height: Theme.pillHeight
-        fillColor: mediaArea.containsMouse ? Theme.panelHover : Theme.panelFill
-        strokeColor: mediaRoot.isPlaying ? Theme.shrineTeal : Theme.panelStroke
+    HoverHandler {
+        id: hover
+    }
 
-        RowLayout {
-            id: mediaRow
-            anchors.centerIn: parent
-            spacing: 8
+    MouseArea {
+        anchors.fill: parent
+        onClicked: if (mediaRoot.activePlayer) mediaRoot.activePlayer.togglePlaying()
+    }
 
-            Glyph {
-                name: "note"
-                size: 14
-                color: mediaRoot.isPlaying ? Theme.shrineTeal : Theme.textSecondary
-            }
+    Row {
+        id: row
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 8
 
-            Text {
-                Layout.maximumWidth: 200
-                text: {
-                    if (!mediaRoot.activePlayer) return "";
-                    var artist = mediaRoot.activePlayer.trackArtist;
-                    var title = mediaRoot.activePlayer.trackTitle || "Unknown Track";
-                    return artist ? (artist + " · " + title) : title;
-                }
-                font.family: Theme.fontDisplay
-                font.pixelSize: Theme.fontSizeSmall
-                font.italic: true
-                color: Theme.textPrimary
-                elide: Text.ElideRight
-            }
-
-            // Controls (visible when hovering or playing)
-            RowLayout {
-                spacing: 6
-                visible: mediaArea.containsMouse || mediaRoot.isPlaying
-
-                Glyph {
-                    name: "prev"
-                    size: 12
-                    color: prevArea.containsMouse ? Theme.sunlit : Theme.textSecondary
-                    MouseArea {
-                        id: prevArea
-                        anchors.fill: parent
-                        anchors.margins: -4
-                        hoverEnabled: true
-                        onClicked: if (mediaRoot.activePlayer) mediaRoot.activePlayer.previous()
-                    }
-                }
-
-                Glyph {
-                    name: mediaRoot.isPlaying ? "pause" : "play"
-                    size: 12
-                    color: playArea.containsMouse ? Theme.sunlit : Theme.textPrimary
-                    MouseArea {
-                        id: playArea
-                        anchors.fill: parent
-                        anchors.margins: -4
-                        hoverEnabled: true
-                        onClicked: if (mediaRoot.activePlayer) mediaRoot.activePlayer.togglePlaying()
-                    }
-                }
-
-                Glyph {
-                    name: "next"
-                    size: 12
-                    color: nextArea.containsMouse ? Theme.sunlit : Theme.textSecondary
-                    MouseArea {
-                        id: nextArea
-                        anchors.fill: parent
-                        anchors.margins: -4
-                        hoverEnabled: true
-                        onClicked: if (mediaRoot.activePlayer) mediaRoot.activePlayer.next()
-                    }
-                }
-            }
+        Glyph {
+            anchors.verticalCenter: parent.verticalCenter
+            name: "note"
+            size: 14
+            color: mediaRoot.isPlaying ? Theme.sheikah : Theme.hudTextDim
         }
 
-        MouseArea {
-            id: mediaArea
-            anchors.fill: parent
-            hoverEnabled: true
-            z: -1
-            onClicked: if (mediaRoot.activePlayer) mediaRoot.activePlayer.togglePlaying()
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            width: Math.min(implicitWidth, 220)
+            text: {
+                if (!mediaRoot.activePlayer) return "";
+                var artist = mediaRoot.activePlayer.trackArtist;
+                var title = mediaRoot.activePlayer.trackTitle || "Unknown track";
+                return artist ? (artist + " · " + title) : title;
+            }
+            font.family: Theme.fontDisplay
+            font.pixelSize: Theme.fontSizeSmall + 1
+            font.italic: true
+            color: hover.hovered ? Theme.hudText : Theme.hudTextDim
+            elide: Text.ElideRight
+        }
+
+        Row {
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+            visible: hover.hovered
+
+            Repeater {
+                model: [
+                    { icon: "prev", action: "previous" },
+                    { icon: mediaRoot.isPlaying ? "pause" : "play", action: "togglePlaying" },
+                    { icon: "next", action: "next" }
+                ]
+
+                Glyph {
+                    name: modelData.icon
+                    size: 12
+                    color: controlArea.containsMouse ? Theme.sheikah : Theme.hudText
+
+                    MouseArea {
+                        id: controlArea
+                        anchors.fill: parent
+                        anchors.margins: -4
+                        hoverEnabled: true
+                        onClicked: if (mediaRoot.activePlayer) mediaRoot.activePlayer[modelData.action]()
+                    }
+                }
+            }
         }
     }
 }

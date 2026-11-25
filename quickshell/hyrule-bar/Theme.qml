@@ -22,9 +22,27 @@ QtObject {
     readonly property color amber: "#e6ad5c"        // Warm Daylight
     readonly property color crimson: "#e0404f"      // Heart Red / Alerts
 
-    // Bar Background (darker at the edges, light filtering in at the center)
-    readonly property color barEdge: "#f0091d1a"
-    readonly property color barCenter: "#f0113a30"
+    // Bar: the game's HUD floats over the scene, so only a soft shade from the top edge
+    readonly property color hudShade: "#a6050e0c"
+    readonly property color hudShadow: "#e6020807"
+    readonly property color hudText: "#f6f2e4"
+    readonly property color hudTextDim: "#c5c8b2"
+
+    // Inventory slots: dark glass with a thin cream frame
+    readonly property color slotFill: "#99050e0c"
+    readonly property color slotFillHover: "#cc12261f"
+    readonly property color slotBorder: "#66eef3d6"
+    readonly property color slotBorderHover: "#d9eef3d6"
+    readonly property color gaugeTrack: "#33eef3d6"
+
+    // Sheikah tech: blue when awake or selected (matches the cursor's clickable state)
+    readonly property color sheikah: "#4fd2ff"
+    readonly property color sheikahFill: "#d90a2733"
+
+    // Pause-menu popups
+    readonly property color menuFill: "#eb050e0c"
+    readonly property color menuBorder: "#4deef3d6"
+    readonly property color menuInner: "#1feef3d6"
 
     // Panels (chamfered HUD plates)
     readonly property color panelFill: "#8c0e372e"
@@ -33,6 +51,10 @@ QtObject {
     readonly property color panelStroke: "#8035694c"
     readonly property color popupFill: "#f70a2420"
     readonly property color popupStroke: "#a69aca68"
+
+    // Desktop widgets: the menus' glass, quiet over the wallpaper, full strength on hover
+    readonly property color widgetFill: "#cc050e0c"
+    readonly property real widgetRestOpacity: 0.55
 
     // Text
     readonly property color textPrimary: "#eef3d6"
@@ -43,8 +65,8 @@ QtObject {
     readonly property color heartRed: "#e0404f"
     readonly property color heartLight: "#ff8a86"
     readonly property color heartRim: "#f5e6c8"
-    readonly property color heartEmpty: "#a6051411"
-    readonly property color heartEmptyRim: "#80c8df7c"
+    readonly property color heartEmpty: "#99050e0c"
+    readonly property color heartEmptyRim: "#b3eef3d6"
     readonly property color stamina: "#b4dc5a"
     readonly property color staminaTrack: "#33b4dc5a"
 
@@ -57,6 +79,7 @@ QtObject {
 
     readonly property int barHeight: 36
     readonly property int pillHeight: 26
+    readonly property int slotSize: 24
     readonly property int cut: 5
     readonly property int iconSize: 15
 

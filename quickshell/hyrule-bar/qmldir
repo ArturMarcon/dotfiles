@@ -1,10 +1,15 @@
 module HyruleBar
 singleton Theme 1.0 Theme.qml
 HyruleBar 1.0 HyruleBar.qml
-HudPanel 1.0 HudPanel.qml
 Glyph 1.0 Glyph.qml
-Flourish 1.0 Flourish.qml
 MenuEntry 1.0 MenuEntry.qml
+MenuFrame 1.0 MenuFrame.qml
+GlassPanel 1.0 GlassPanel.qml
+ItemSlot 1.0 ItemSlot.qml
+Rule 1.0 Rule.qml
+SheikahEye 1.0 SheikahEye.qml
+HudGauge 1.0 HudGauge.qml
+HudShadow 1.0 HudShadow.qml
 HeartContainer 1.0 HeartContainer.qml
 HeartsModule 1.0 HeartsModule.qml
 WorkspacesModule 1.0 WorkspacesModule.qml
@@ -15,3 +20,9 @@ StaminaModule 1.0 StaminaModule.qml
 TrayModule 1.0 TrayModule.qml
 PowerModule 1.0 PowerModule.qml
 SlateLauncher 1.0 SlateLauncher.qml
+singleton SystemStats 1.0 SystemStats.qml
+Sparkline 1.0 Sparkline.qml
+StatCard 1.0 StatCard.qml
+SystemWidget 1.0 SystemWidget.qml
+CalendarWidget 1.0 CalendarWidget.qml
+DesktopWidgets 1.0 DesktopWidgets.qml

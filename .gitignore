@@ -19,6 +19,12 @@
 !/kdeglobals
 # KDE color schemes, symlinked into ~/.local/share/color-schemes/
 !/color-schemes/
+# Cursor theme source; build.py installs it into ~/.local/share/icons/Hyrule
+!/hyrule-cursor/
+!/kcminputrc
+
+# A yay build checkout, not config
+/hypr/yay/
 
 # Explicitly exclude known non-customization/state directories (redundant with /*, but kept for clarity)
 /Antigravity IDE/
@@ -36,3 +42,4 @@
 *.log
 *.tdb
 cookie
+__pycache__/

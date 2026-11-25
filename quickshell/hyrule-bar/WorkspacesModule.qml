@@ -2,81 +2,60 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
+// Workspaces as inventory slots, the focused one selected in Sheikah blue,
+// followed by the active window's title.
 Row {
     id: workspacesRoot
-    spacing: 10
-    height: Theme.pillHeight
+    spacing: 12
+    height: Theme.slotSize
 
-    // Set by the bar so the title never runs into the center section
+    // Set by the bar so the title never runs into the clock
     property real titleMaxWidth: 260
     readonly property bool showTitle: titleMaxWidth >= 60
-    readonly property real fixedWidth: slotsRow.width + divider.width + spacing * 2
+    readonly property real fixedWidth: slotsRow.width + spacing
 
-    // Shrine Markers (Workspaces)
     Row {
         id: slotsRow
-        spacing: 5
-        height: Theme.pillHeight
+        spacing: 7
+        height: Theme.slotSize
 
         Repeater {
             model: Hyprland.workspaces
 
-            delegate: HudPanel {
-                id: wsSlot
-                width: modelData.focused ? 44 : (wsArea.containsMouse ? 32 : 26)
-                height: Theme.pillHeight
-                cut: 4
-                fillColor: modelData.focused ? Theme.panelActive : (wsArea.containsMouse ? Theme.panelHover : Theme.panelFill)
-                strokeColor: modelData.focused ? Theme.sunlit : (modelData.active ? Theme.shrineTeal : (wsArea.containsMouse ? Theme.leaf : Theme.panelStroke))
+            delegate: ItemSlot {
+                id: slot
+                active: modelData.focused
 
-                Behavior on width { NumberAnimation { duration: Theme.animDurationNormal; easing.type: Easing.OutCubic } }
-
-                Row {
+                Text {
                     anchors.centerIn: parent
-                    spacing: 5
+                    text: modelData.id > 0 ? modelData.id.toString() : "✧"
+                    font.family: Theme.fontDisplay
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.bold: true
+                    color: slot.active ? "#ffffff" : (modelData.active || slot.hovered ? Theme.hudText : Theme.hudTextDim)
+                    Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
+                }
 
-                    Glyph {
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: "diamond"
-                        size: 9
-                        color: Theme.sunlit
-                        visible: modelData.focused
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: modelData.id > 0 ? modelData.id.toString() : "✧"
-                        font.family: Theme.fontDisplay
-                        font.pixelSize: modelData.focused ? Theme.fontSizeMedium : Theme.fontSizeSmall
-                        font.bold: true
-                        color: modelData.focused ? Theme.sunbeam : (modelData.active ? Theme.shrineTeal : Theme.textSecondary)
-                        Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
-                    }
+                // Shown on another monitor: a small dot under the slot
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.bottom
+                    anchors.topMargin: 2
+                    width: 4
+                    height: 4
+                    radius: 2
+                    color: Theme.hudText
+                    visible: modelData.active && !modelData.focused
                 }
 
                 MouseArea {
-                    id: wsArea
                     anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                        Hyprland.dispatch("workspace " + modelData.id);
-                    }
+                    onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + modelData.id + " })")
                 }
             }
         }
     }
 
-    // Divider
-    Glyph {
-        id: divider
-        anchors.verticalCenter: parent.verticalCenter
-        visible: workspacesRoot.showTitle
-        name: "diamond"
-        size: 7
-        color: Theme.moss
-    }
-
-    // Current Quest (Window Title)
     Text {
         anchors.verticalCenter: parent.verticalCenter
         visible: workspacesRoot.showTitle
@@ -85,7 +64,7 @@ Row {
         font.family: Theme.fontDisplay
         font.pixelSize: Theme.fontSizeMedium
         font.italic: true
-        color: Theme.textSecondary
+        color: Theme.hudTextDim
         elide: Text.ElideRight
     }
 }

@@ -4,16 +4,20 @@ import Quickshell
 import Quickshell._Window
 import Quickshell.Hyprland
 
+// Time set like one of the game's area titles: serif between fading rules.
+// Clicking opens the month in the pause-menu style.
 Item {
     id: clockRoot
-    implicitWidth: clockPanel.width
-    implicitHeight: Theme.pillHeight
+    implicitWidth: row.implicitWidth
+    implicitHeight: Theme.slotSize
     width: implicitWidth
     height: implicitHeight
 
     property var barWindow: null
+    property bool compact: false
     property bool calendarOpen: false
     property double lastCloseTime: 0
+    readonly property bool lit: calendarOpen || hover.hovered
 
     HyprlandFocusGrab {
         active: clockRoot.calendarOpen
@@ -32,69 +36,42 @@ Item {
     property int displayMonth: 0
     property var calendarDays: []
 
+    readonly property var monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
     function updateTime() {
         var d = new Date();
-        var hours = d.getHours().toString().padStart(2, '0');
-        var mins = d.getMinutes().toString().padStart(2, '0');
-        timeStr = hours + ":" + mins;
+        timeStr = d.getHours().toString().padStart(2, '0') + ":" + d.getMinutes().toString().padStart(2, '0');
         isDaytime = d.getHours() >= 6 && d.getHours() < 18;
 
-        var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        dateStr = days[d.getDay()] + ", " + months[d.getMonth()] + " " + d.getDate();
+        var days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+        dateStr = days[d.getDay()] + "  " + d.getDate() + " " + monthNames[d.getMonth()].slice(0, 3).toUpperCase();
         fullDateStr = d.toLocaleDateString(Qt.locale(), Locale.LongFormat);
     }
 
+    // Monday-first 6x7 grid, padded with the neighbouring months
     function updateCalendarGrid() {
         var days = [];
-        var firstDay = new Date(displayYear, displayMonth, 1);
-        var startDayOfWeek = firstDay.getDay(); // 0 (Sun) to 6 (Sat)
+        var lead = (new Date(displayYear, displayMonth, 1).getDay() + 6) % 7;
         var daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
         var daysInPrevMonth = new Date(displayYear, displayMonth, 0).getDate();
-
-        // Previous month trailing days
-        for (var i = startDayOfWeek - 1; i >= 0; i--) {
-            days.push({ dayNumber: daysInPrevMonth - i, isCurrentMonth: false, isToday: false });
-        }
-
-        // Current month days
         var today = new Date();
+
+        for (var i = lead - 1; i >= 0; i--)
+            days.push({ dayNumber: daysInPrevMonth - i, isCurrentMonth: false, isToday: false });
         for (var d = 1; d <= daysInMonth; d++) {
-            var isToday = (today.getFullYear() === displayYear && today.getMonth() === displayMonth && today.getDate() === d);
+            var isToday = today.getFullYear() === displayYear && today.getMonth() === displayMonth && today.getDate() === d;
             days.push({ dayNumber: d, isCurrentMonth: true, isToday: isToday });
         }
-
-        // Next month leading days to complete 6 rows of 7 days (42 cells total)
-        var remaining = 42 - days.length;
-        for (var n = 1; n <= remaining; n++) {
+        for (var n = 1; days.length < 42; n++)
             days.push({ dayNumber: n, isCurrentMonth: false, isToday: false });
-        }
         calendarDays = days;
     }
 
-    function prevMonth() {
-        if (displayMonth === 0) {
-            displayMonth = 11;
-            displayYear -= 1;
-        } else {
-            displayMonth -= 1;
-        }
+    function shiftMonth(step) {
+        var m = displayMonth + step;
+        displayYear += Math.floor(m / 12);
+        displayMonth = ((m % 12) + 12) % 12;
         updateCalendarGrid();
-    }
-
-    function nextMonth() {
-        if (displayMonth === 11) {
-            displayMonth = 0;
-            displayYear += 1;
-        } else {
-            displayMonth += 1;
-        }
-        updateCalendarGrid();
-    }
-
-    function getMonthName(m) {
-        var names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        return names[m] || "";
     }
 
     Timer {
@@ -112,256 +89,193 @@ Item {
         updateCalendarGrid();
     }
 
-    // Time-of-Day Plate
-    HudPanel {
-        id: clockPanel
-        width: clockRow.implicitWidth + 26
-        height: Theme.pillHeight
-        cut: 7
-        fillColor: clockRoot.calendarOpen ? Theme.panelActive : (clockArea.containsMouse ? Theme.panelHover : Theme.panelFill)
-        strokeColor: clockRoot.calendarOpen || clockArea.containsMouse ? Theme.sunlit : Theme.panelStroke
+    Row {
+        id: row
+        anchors.centerIn: parent
+        spacing: 10
 
-        RowLayout {
-            id: clockRow
-            anchors.centerIn: parent
-            spacing: 8
-
-            Glyph {
-                name: clockRoot.isDaytime ? "sun" : "moon"
-                size: 15
-                color: clockRoot.isDaytime ? Theme.amber : Theme.shrineTeal
-            }
-
-            Text {
-                text: clockRoot.timeStr
-                font.family: Theme.fontDisplay
-                font.pixelSize: Theme.fontSizeLarge
-                font.bold: true
-                color: Theme.sunbeam
-            }
-
-            Glyph {
-                name: "diamond"
-                size: 6
-                color: Theme.leaf
-            }
-
-            Text {
-                text: clockRoot.dateStr
-                font.family: Theme.fontDisplay
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.textSecondary
-            }
+        Rule {
+            anchors.verticalCenter: parent.verticalCenter
+            width: clockRoot.compact ? 26 : 70
+            fadeLeft: true
+            opacity: clockRoot.lit ? 1 : 0.8
         }
 
-        MouseArea {
-            id: clockArea
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-                if (Date.now() - clockRoot.lastCloseTime < 200) return;
-                if (!clockRoot.calendarOpen) {
-                    var now = new Date();
-                    clockRoot.displayYear = now.getFullYear();
-                    clockRoot.displayMonth = now.getMonth();
-                    clockRoot.updateCalendarGrid();
-                }
-                clockRoot.calendarOpen = !clockRoot.calendarOpen;
-            }
+        Glyph {
+            anchors.verticalCenter: parent.verticalCenter
+            name: clockRoot.isDaytime ? "sun" : "moon"
+            size: 15
+            color: clockRoot.isDaytime ? Theme.amber : Theme.sheikah
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: clockRoot.timeStr
+            font.family: Theme.fontDisplay
+            font.pixelSize: 17
+            font.bold: true
+            color: clockRoot.lit ? "#ffffff" : Theme.hudText
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 1
+            text: clockRoot.dateStr
+            font.family: Theme.fontUi
+            font.pixelSize: 10
+            font.bold: true
+            font.letterSpacing: 1.5
+            color: Theme.hudTextDim
+        }
+
+        Rule {
+            anchors.verticalCenter: parent.verticalCenter
+            width: clockRoot.compact ? 26 : 70
+            opacity: clockRoot.lit ? 1 : 0.8
         }
     }
 
-    // Month Calendar Popup
+    HoverHandler {
+        id: hover
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            if (Date.now() - clockRoot.lastCloseTime < 200) return;
+            if (!clockRoot.calendarOpen) {
+                var now = new Date();
+                clockRoot.displayYear = now.getFullYear();
+                clockRoot.displayMonth = now.getMonth();
+                clockRoot.updateCalendarGrid();
+            }
+            clockRoot.calendarOpen = !clockRoot.calendarOpen;
+        }
+    }
+
     PopupWindow {
         id: calPopup
         visible: clockRoot.calendarOpen
         color: "transparent"
-        implicitWidth: 320
-        implicitHeight: 376
-        anchor.window: clockRoot.barWindow
-        anchor.rect.x: clockRoot.mapToItem(null, 0, 0).x - (320 - clockPanel.width) / 2
-        anchor.rect.y: Theme.barHeight + 4
+        implicitWidth: 310
+        implicitHeight: calMenu.implicitHeight
+        anchor.item: clockRoot
+        anchor.rect.x: (clockRoot.width - 310) / 2
+        anchor.rect.y: clockRoot.height + (Theme.barHeight - clockRoot.height) / 2 + 4
 
         onClosed: {
             clockRoot.lastCloseTime = Date.now();
             clockRoot.calendarOpen = false;
         }
 
-        HudPanel {
+        MenuFrame {
+            id: calMenu
             anchors.fill: parent
-            cut: 12
-            fillColor: Theme.popupFill
-            strokeColor: Theme.popupStroke
+            title: clockRoot.timeStr
+            subtitle: clockRoot.fullDateStr
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 16
-                spacing: 10
+            // Month navigation
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.bottomMargin: 6
 
-                // Time & Date Header
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 12
-
+                ItemSlot {
                     Glyph {
-                        name: clockRoot.isDaytime ? "sun" : "moon"
-                        size: 26
-                        color: clockRoot.isDaytime ? Theme.amber : Theme.shrineTeal
+                        anchors.centerIn: parent
+                        name: "chevron-left"
+                        size: 12
+                        color: Theme.hudText
                     }
 
-                    ColumnLayout {
-                        spacing: 0
-                        Text {
-                            text: clockRoot.timeStr
-                            font.family: Theme.fontDisplay
-                            font.pixelSize: 24
-                            font.bold: true
-                            color: Theme.sunbeam
-                        }
-                        Text {
-                            text: clockRoot.fullDateStr
-                            font.family: Theme.fontDisplay
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.italic: true
-                            color: Theme.leaf
-                        }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: clockRoot.shiftMonth(-1)
                     }
                 }
 
-                Flourish {
+                Text {
                     Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    text: clockRoot.monthNames[clockRoot.displayMonth].toUpperCase() + "  " + clockRoot.displayYear
+                    font.family: Theme.fontUi
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.bold: true
+                    font.letterSpacing: 2.5
+                    color: Theme.hudText
                 }
 
-                // Month & Year Navigation
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 8
-
-                    HudPanel {
-                        width: 28
-                        height: 28
-                        cut: 4
-                        fillColor: prevBtnArea.containsMouse ? Theme.panelHover : "transparent"
-                        strokeColor: prevBtnArea.containsMouse ? Theme.leaf : "transparent"
-
-                        Glyph {
-                            anchors.centerIn: parent
-                            name: "chevron-left"
-                            size: 13
-                            color: prevBtnArea.containsMouse ? Theme.sunlit : Theme.textPrimary
-                        }
-
-                        MouseArea {
-                            id: prevBtnArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: clockRoot.prevMonth()
-                        }
+                ItemSlot {
+                    Glyph {
+                        anchors.centerIn: parent
+                        name: "chevron-right"
+                        size: 12
+                        color: Theme.hudText
                     }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: clockRoot.shiftMonth(1)
+                    }
+                }
+            }
+
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 2
+
+                Repeater {
+                    model: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 
                     Text {
-                        Layout.fillWidth: true
+                        width: 36
                         horizontalAlignment: Text.AlignHCenter
-                        text: clockRoot.getMonthName(clockRoot.displayMonth) + " " + clockRoot.displayYear
-                        font.family: Theme.fontDisplay
-                        font.pixelSize: Theme.fontSizeLarge
+                        text: modelData
+                        font.family: Theme.fontUi
+                        font.pixelSize: 10
                         font.bold: true
-                        color: Theme.sunlit
+                        color: index >= 5 ? Theme.textMuted : Theme.hudTextDim
                     }
+                }
+            }
 
-                    HudPanel {
-                        width: 28
+            Grid {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.bottomMargin: 4
+                columns: 7
+                rowSpacing: 3
+                columnSpacing: 2
+
+                Repeater {
+                    model: clockRoot.calendarDays
+
+                    Item {
+                        width: 36
                         height: 28
-                        cut: 4
-                        fillColor: nextBtnArea.containsMouse ? Theme.panelHover : "transparent"
-                        strokeColor: nextBtnArea.containsMouse ? Theme.leaf : "transparent"
 
-                        Glyph {
+                        // Today is the selected slot; others show a frame on hover
+                        ItemSlot {
                             anchors.centerIn: parent
-                            name: "chevron-right"
-                            size: 13
-                            color: nextBtnArea.containsMouse ? Theme.sunlit : Theme.textPrimary
+                            width: 28
+                            height: 24
+                            active: modelData.isToday
+                            visible: modelData.isToday || dayHover.hovered
                         }
 
-                        MouseArea {
-                            id: nextBtnArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: clockRoot.nextMonth()
+                        Text {
+                            anchors.centerIn: parent
+                            text: modelData.dayNumber
+                            font.family: Theme.fontDisplay
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.bold: modelData.isToday
+                            color: modelData.isToday ? "#ffffff" : Theme.hudText
+                            opacity: modelData.isCurrentMonth ? 1.0 : 0.3
                         }
-                    }
-                }
 
-                // Days of Week Header Row
-                Row {
-                    Layout.alignment: Qt.AlignHCenter
-                    spacing: 4
-                    Repeater {
-                        model: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-                        delegate: Item {
-                            width: 36
-                            height: 20
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData
-                                font.family: Theme.fontDisplay
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.bold: true
-                                color: Theme.fern
-                            }
+                        HoverHandler {
+                            id: dayHover
                         }
                     }
                 }
-
-                // 6x7 Month Grid
-                Grid {
-                    Layout.alignment: Qt.AlignHCenter
-                    columns: 7
-                    rowSpacing: 4
-                    columnSpacing: 4
-
-                    Repeater {
-                        model: clockRoot.calendarDays
-                        delegate: HudPanel {
-                            id: dayCell
-                            width: 36
-                            height: 30
-                            cut: 4
-                            fillColor: {
-                                if (modelData.isToday) return Theme.sunlit;
-                                if (dayArea.containsMouse) return Theme.panelHover;
-                                return "transparent";
-                            }
-                            strokeColor: {
-                                if (modelData.isToday) return Theme.sunbeam;
-                                if (dayArea.containsMouse) return Theme.leaf;
-                                return "transparent";
-                            }
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.dayNumber
-                                font.family: Theme.fontDisplay
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.bold: modelData.isToday || modelData.isCurrentMonth
-                                color: {
-                                    if (modelData.isToday) return Theme.abyss;
-                                    if (!modelData.isCurrentMonth) return Theme.textMuted;
-                                    return Theme.textPrimary;
-                                }
-                                opacity: modelData.isCurrentMonth ? 1.0 : 0.5
-                            }
-
-                            MouseArea {
-                                id: dayArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                            }
-                        }
-                    }
-                }
-
-                Item { Layout.fillHeight: true }
             }
         }
     }

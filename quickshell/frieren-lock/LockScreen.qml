@@ -129,8 +129,7 @@ Scope {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    var inputItem = lockSurface.contentItem.findChild("incantationInput");
-                    if (inputItem) inputItem.forceActiveFocus();
+                    incantationInput.forceActiveFocus();
                 }
             }
 
