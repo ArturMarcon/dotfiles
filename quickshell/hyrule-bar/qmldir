@@ -1,0 +1,17 @@
+module HyruleBar
+singleton Theme 1.0 Theme.qml
+HyruleBar 1.0 HyruleBar.qml
+HudPanel 1.0 HudPanel.qml
+Glyph 1.0 Glyph.qml
+Flourish 1.0 Flourish.qml
+MenuEntry 1.0 MenuEntry.qml
+HeartContainer 1.0 HeartContainer.qml
+HeartsModule 1.0 HeartsModule.qml
+WorkspacesModule 1.0 WorkspacesModule.qml
+ClockModule 1.0 ClockModule.qml
+MediaModule 1.0 MediaModule.qml
+AudioModule 1.0 AudioModule.qml
+StaminaModule 1.0 StaminaModule.qml
+TrayModule 1.0 TrayModule.qml
+PowerModule 1.0 PowerModule.qml
+SlateLauncher 1.0 SlateLauncher.qml
