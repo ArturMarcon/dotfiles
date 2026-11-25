@@ -5,7 +5,7 @@
                                 
 -- environment variables
 --source = ~/.config/hypr/environment.conf
--- require("environment")
+require("environment")
 
 -- nvidia gpu settings
 -- source = ~/.config/hypr/nvidia.conf

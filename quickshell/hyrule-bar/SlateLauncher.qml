@@ -124,7 +124,7 @@ Item {
 
                 Repeater {
                     model: [
-                        { title: "Stasis", subtitle: "Lock Wayland session", icon: "lock", cmd: "qs -p /home/arturmarcon/.config/quickshell/frieren-lock/lockscreen.qml &", color: Theme.sunlit },
+                        { title: "Stasis", subtitle: "Lock Wayland session", icon: "lock", cmd: "qs -p /home/arturmarcon/.config/quickshell/hyrule-lock/shell.qml &", color: Theme.sunlit },
                         { title: "Terminal", subtitle: "Launch Kitty shell", icon: "terminal", cmd: "kitty &", color: Theme.shrineTeal },
                         { title: "Files", subtitle: "Browse file system", icon: "folder", cmd: "dolphin &", color: Theme.amber },
                         { title: "Search", subtitle: "Application launcher", icon: "search", cmd: "rofi -show drun || wofi --show drun &", color: Theme.leaf },

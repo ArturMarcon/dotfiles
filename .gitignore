@@ -13,10 +13,15 @@
 !/starship.toml
 !/dolphinrc
 !/pavucontrol.ini
+!/wofi/
+!/btop/
+!/qt6ct/
+!/kdeglobals
+# KDE color schemes, symlinked into ~/.local/share/color-schemes/
+!/color-schemes/
 
 # Explicitly exclude known non-customization/state directories (redundant with /*, but kept for clarity)
 /Antigravity IDE/
-/btop/
 /dconf/
 /gh/
 /matplotlib/

@@ -9,7 +9,7 @@ hl.config({
         border_size = 2,
         col = {
             active_border = { colors = { color11, "rgba(59595900)", color14 }, angle = 45 },
-            inactive_border = "rgba(595959aa)",
+            inactive_border = "rgba(35694caa)",
         }, 
 
         resize_on_border = false,
@@ -31,7 +31,7 @@ hl.config({
             enabled    = true,
             size       = 5,
             passes     = 3,
-            vibrancy   = 2,
+            vibrancy   = 1.0, -- max allowed is 1.0
             contrast   = 1.5,
             brightness = 1.0,
         },

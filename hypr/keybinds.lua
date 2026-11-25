@@ -2,8 +2,8 @@
 ------ KEYBINDINGS ------
 -------------------------
 local terminal = "kitty"
-local fileManager = "cosmic-files"
-local menu = "hyprlauncher"
+local fileManager = "dolphin"
+local menu = "wofi --show drun"
 local shape_theme = "~/Desktop/shape-theme/theme-menu.sh"
 local shape_theme_fill = "~/Desktop/shape-theme/change-theme-menu-wallcrop.sh"
 
@@ -25,11 +25,17 @@ hl.bind(mainMod .. " + SHIFT + J",   hl.dsp.layout("togglesplit")) -- dwindle on
 hl.bind(mainMod .. " + E",           hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + B",           hl.dsp.exec_cmd("firefox"))
 hl.bind(mainMod .. " + SPACE",       hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + W",           hl.dsp.exec_cmd(shape_theme))
-hl.bind(mainMod .. " + SHIFT + W",   hl.dsp.exec_cmd(shape_theme_fill))
-hl.bind(mainMod .. " + SHIFT + L",   hl.dsp.exec_cmd("hyprlock"))
+-- shape-theme scripts are missing from ~/Desktop/shape-theme; SUPER+W is WhatsApp below
+-- hl.bind(mainMod .. " + W",           hl.dsp.exec_cmd(shape_theme))
+-- hl.bind(mainMod .. " + SHIFT + W",   hl.dsp.exec_cmd(shape_theme_fill))
+hl.bind(mainMod .. " + SHIFT + L",   hl.dsp.exec_cmd("qs -p /home/arturmarcon/.config/quickshell/hyrule-lock/shell.qml"))
 hl.bind(mainMod .. " + Z",           hl.dsp.exec_cmd("hexecute"))
-hl.bind(mainMod .. " + Print",       hl.dsp.exec_cmd("region=$(slurp); sleep 0.5; grim -g \"$region\" ~/$(date +'%s_grim.png')"))
+-- Screenshots
+local screenshot = "~/.config/hypr/screenshot.sh"
+hl.bind("Print",                   hl.dsp.exec_cmd(screenshot .. " full"))
+hl.bind("SHIFT + Print",           hl.dsp.exec_cmd(screenshot .. " region"))
+hl.bind(mainMod .. " + Print",     hl.dsp.exec_cmd(screenshot .. " region"))
+hl.bind("ALT + Print",             hl.dsp.exec_cmd(screenshot .. " window"))
 
 -- Move focus with mainMod + arrow keys / vim motions
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -72,4 +78,3 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl s 10%-"), { lock
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("firefox 'https://github.com/orgs/GRINPROJS-PUCRS/projects/26/views/2'"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("firefox 'https://web.whatsapp.com/'"))
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("firefox 'https://discord.com/channels/@me'"))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs -p /home/arturmarcon/.config/quickshell/lockscreen.qml"))

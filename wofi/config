@@ -1,0 +1,11 @@
+width=520
+height=400
+location=center
+prompt=Where to?
+insensitive=true
+matching=fuzzy
+allow_images=true
+image_size=22
+no_actions=true
+hide_scroll=true
+gtk_dark=true

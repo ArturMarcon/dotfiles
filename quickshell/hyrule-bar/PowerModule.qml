@@ -111,7 +111,7 @@ Item {
 
                 Repeater {
                     model: [
-                        { title: "Stasis", subtitle: "Lock screen", icon: "lock", cmd: "qs -p /home/arturmarcon/.config/quickshell/frieren-lock/lockscreen.qml || loginctl lock-session &", color: Theme.sunlit },
+                        { title: "Stasis", subtitle: "Lock screen", icon: "lock", cmd: "qs -p /home/arturmarcon/.config/quickshell/hyrule-lock/shell.qml || loginctl lock-session &", color: Theme.sunlit },
                         { title: "Rest by the Fire", subtitle: "Suspend to RAM", icon: "campfire", cmd: "systemctl suspend &", color: Theme.amber },
                         { title: "Blood Moon", subtitle: "Reboot system", icon: "blood-moon", cmd: "systemctl reboot &", color: Theme.heartLight },
                         { title: "Depart", subtitle: "Power off system", icon: "power", cmd: "systemctl poweroff &", color: Theme.crimson }

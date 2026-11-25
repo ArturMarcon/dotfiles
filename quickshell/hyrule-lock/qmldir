@@ -1,0 +1,8 @@
+module HyruleLock
+singleton Theme 1.0 Theme.qml
+LockScreen 1.0 LockScreen.qml
+LockSurface 1.0 LockSurface.qml
+Fireflies 1.0 Fireflies.qml
+Glyph 1.0 Glyph.qml
+HudPanel 1.0 HudPanel.qml
+HeartContainer 1.0 HeartContainer.qml
