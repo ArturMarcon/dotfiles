@@ -1,6 +1,6 @@
 if status is-interactive
-	## Vertical list replacement for ls
-	alias ls="exa -1a --icons --color=always --group-directories-first"
+	## Grid listing replacement for ls
+	alias ls="exa -a --icons --color=always --group-directories-first"
 
 	# Detailed list view
 	alias ll="exa -lah --icons --color=always --group-directories-first --git --header"

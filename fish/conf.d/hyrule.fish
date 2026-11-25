@@ -39,7 +39,7 @@ set -g fish_pager_color_selected_description c8df7c
 # Once a command runs, its prompt collapses to the heart line (see fish_prompt)
 set -g fish_transient_prompt 1
 
-# fzf popups: Ctrl+R history, Ctrl+T files, Alt+C folders (active once fzf is installed)
+# fzf popups: Ctrl+R history, Ctrl+T folders, Alt+C files (active once fzf is installed)
 set -gx FZF_DEFAULT_OPTS "--layout=reverse --height=50% --border=rounded --info=inline-right \
 --prompt='◆ ' --pointer='➤' --marker='♥' --separator='─' --scrollbar='▏' \
 --color=fg:#c9d4b4,fg+:#eef3d6,bg:-1,bg+:#1e4a38,gutter:-1,hl:#c8df7c,hl+:#c8df7c \
@@ -56,6 +56,11 @@ if type -q bat
 end
 if type -q fzf
     fzf --fish | source
+    # Swapped from fzf's defaults: Ctrl+T jumps to a folder, Alt+C picks files
+    for mode in default insert
+        bind -M $mode ctrl-t fzf-cd-widget
+        bind -M $mode alt-c fzf-file-widget
+    end
 end
 
 # A command that ran 30s+ sends a desktop notification if you looked away
