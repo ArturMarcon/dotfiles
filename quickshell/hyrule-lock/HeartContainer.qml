@@ -1,7 +1,7 @@
 import QtQuick
 
-// A single heart container. `fill` runs 0..1 and drains like a pie,
-// one quarter at a time, clockwise from the top.
+// A single heart container. `fill` runs 0..1 and drains like a pie, one
+// quarter at a time, emptying from the right like the row of hearts does.
 Canvas {
     id: heart
     property real fill: 1.0
@@ -56,7 +56,7 @@ Canvas {
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, width, -Math.PI / 2, -Math.PI / 2 + fill * Math.PI * 2, false);
+            ctx.arc(cx, cy, width, -Math.PI / 2, -Math.PI / 2 - fill * Math.PI * 2, true);
             ctx.closePath();
             ctx.clip();
 
