@@ -14,6 +14,7 @@ Item {
     readonly property bool portrait: height > width
     readonly property real ui: Math.max(0.7, Math.min(width, height) / 1080)
     readonly property string wallDir: Quickshell.env("HOME") + "/wallpapers/"
+    property bool slowAuth: false
 
     readonly property string message: {
         if (!lock) return "";
@@ -23,12 +24,18 @@ Item {
             return "You're out of hearts. Rest a while and try again in "
                 + Math.floor(s / 60) + ":" + (s % 60).toString().padStart(2, '0') + ".";
         }
-        if (lock.authenticating) return "Checking…";
         if (lock.failed) {
             var left = lock.heartsShown;
             return "That's not it. You took damage — " + left + (left === 1 ? " heart" : " hearts") + " left.";
         }
-        return "The way ahead is sealed. Enter your password to continue.";
+        return "";
+    }
+
+    // Lockout length in words, e.g. "1 minute" or "90 seconds"
+    readonly property string restLength: {
+        var s = lock ? lock.lockoutSeconds : 600;
+        if (s % 60 !== 0) return s + " seconds";
+        return s / 60 + (s === 60 ? " minute" : " minutes");
     }
 
     // ---------------------------------------------------------------------
@@ -100,6 +107,45 @@ Item {
         count: surface.portrait ? 26 : 34
     }
 
+    // Taking damage: the screen edges flash red
+    Shape {
+        id: hurtFlash
+        anchors.fill: parent
+        opacity: 0
+
+        ShapePath {
+            strokeColor: "transparent"
+            fillGradient: RadialGradient {
+                centerX: surface.width / 2
+                centerY: surface.height / 2
+                centerRadius: Math.max(surface.width, surface.height) * 0.7
+                focalX: centerX
+                focalY: centerY
+                GradientStop { position: 0.45; color: "#00e0404f" }
+                GradientStop { position: 1.0; color: "#d9b01e2c" }
+            }
+            startX: 0; startY: 0
+            PathLine { x: surface.width; y: 0 }
+            PathLine { x: surface.width; y: surface.height }
+            PathLine { x: 0; y: surface.height }
+            PathLine { x: 0; y: 0 }
+        }
+
+        SequentialAnimation {
+            id: hurtFlashAnim
+            NumberAnimation { target: hurtFlash; property: "opacity"; to: 1; duration: 60 }
+            NumberAnimation { target: hurtFlash; property: "opacity"; to: 0; duration: 650; easing.type: Easing.InQuad }
+        }
+    }
+
+    Connections {
+        target: surface.lock
+        function onDamaged() {
+            hurtFlashAnim.restart();
+            heartsShake.restart();
+        }
+    }
+
     // ---------------------------------------------------------------------
     // HUD: heart containers (attempts left before faillock), top-left
     // ---------------------------------------------------------------------
@@ -109,6 +155,17 @@ Item {
         anchors.top: parent.top
         anchors.margins: 44 * surface.ui
         spacing: 7 * surface.ui
+
+        transform: Translate { id: heartsNudge }
+
+        SequentialAnimation {
+            id: heartsShake
+            NumberAnimation { target: heartsNudge; property: "x"; to: -7 * surface.ui; duration: 40 }
+            NumberAnimation { target: heartsNudge; property: "x"; to: 6 * surface.ui; duration: 60 }
+            NumberAnimation { target: heartsNudge; property: "x"; to: -4 * surface.ui; duration: 55 }
+            NumberAnimation { target: heartsNudge; property: "x"; to: 2 * surface.ui; duration: 45 }
+            NumberAnimation { target: heartsNudge; property: "x"; to: 0; duration: 40 }
+        }
 
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -125,6 +182,8 @@ Item {
                 implicitWidth: 34 * surface.ui
                 implicitHeight: 31 * surface.ui
                 rimWidth: 1.5
+                animated: surface.lock ? surface.lock.tallyLoaded : false
+                healDelay: index * 180
                 fill: surface.lock && index < surface.lock.heartsShown ? 1 : 0
                 pulsing: surface.lock && surface.lock.heartsShown === 1 && index === 0
             }
@@ -300,8 +359,8 @@ Item {
     // ---------------------------------------------------------------------
     Item {
         id: dialogue
-        width: Math.min(780 * surface.ui, surface.width - 64 * surface.ui)
-        height: dialogueColumn.implicitHeight + 52 * surface.ui
+        width: Math.min(480 * surface.ui, surface.width - 64 * surface.ui)
+        height: dialogueColumn.implicitHeight + 36 * surface.ui
         x: (surface.width - width) / 2 + shakeOffset
         y: surface.height * (surface.portrait ? 0.6 : 0.6)
 
@@ -323,18 +382,18 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: 24 * surface.ui
-            color: "#bf040b0a"
+            radius: 16 * surface.ui
+            color: "#73040b0a"
             border.width: 1
-            border.color: "#33eef3d6"
+            border.color: "#1feef3d6"
 
             Rectangle {
                 anchors.fill: parent
-                anchors.margins: 5 * surface.ui
-                radius: parent.radius - 5 * surface.ui
+                anchors.margins: 4 * surface.ui
+                radius: parent.radius - 4 * surface.ui
                 color: "transparent"
                 border.width: 1
-                border.color: surface.lock && surface.lock.failed ? "#99e0404f" : "#1aeef3d6"
+                border.color: surface.lock && surface.lock.failed ? "#80e0404f" : "#0deef3d6"
                 Behavior on border.color { ColorAnimation { duration: Theme.animDurationNormal } }
             }
         }
@@ -344,26 +403,28 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.leftMargin: 34 * surface.ui
-            anchors.rightMargin: 34 * surface.ui
-            anchors.topMargin: 24 * surface.ui
-            spacing: 12 * surface.ui
+            anchors.leftMargin: 26 * surface.ui
+            anchors.rightMargin: 26 * surface.ui
+            anchors.topMargin: 18 * surface.ui
+            spacing: 8 * surface.ui
 
             // Speaker
             Text {
                 text: surface.lock ? surface.lock.user : ""
                 font.family: Theme.fontDisplay
-                font.pixelSize: 17 * surface.ui
+                font.pixelSize: 14 * surface.ui
                 font.bold: true
-                color: Theme.amber
+                font.letterSpacing: 1
+                color: Theme.textSecondary
             }
 
             Text {
                 width: parent.width
+                visible: text !== ""
                 text: surface.message
                 wrapMode: Text.WordWrap
                 font.family: Theme.fontDisplay
-                font.pixelSize: 21 * surface.ui
+                font.pixelSize: 17 * surface.ui
                 color: surface.lock && (surface.lock.failed || surface.lock.lockoutRemaining > 0) ? Theme.heartLight : Theme.sunbeam
                 Behavior on color { ColorAnimation { duration: Theme.animDurationNormal } }
             }
@@ -439,7 +500,14 @@ Item {
             }
         }
 
-        // Spinner while PAM is checking
+        // Spinner, only if PAM is slow to answer
+        Timer {
+            interval: 400
+            running: surface.lock && surface.lock.authenticating
+            onTriggered: surface.slowAuth = true
+            onRunningChanged: if (!running) surface.slowAuth = false
+        }
+
         Glyph {
             anchors.right: parent.right
             anchors.rightMargin: 24 * surface.ui
@@ -449,7 +517,7 @@ Item {
             size: 22 * surface.ui
             weight: 1.6
             color: Theme.shrineTeal
-            visible: surface.lock && surface.lock.authenticating
+            visible: surface.slowAuth
 
             RotationAnimation on rotation {
                 loops: Animation.Infinite
@@ -479,7 +547,8 @@ Item {
             "Print captures the screen. Shift + Print grabs a region, Alt + Print a window.",
             "Super + Q closes the focused window.",
             "Hover the hearts on the bar to see the exact CPU load.",
-            "A wrong password costs a heart. Lose all three and you must rest for 10 minutes."
+            "A wrong password costs a heart. Lose all " + (surface.lock ? surface.lock.maxHearts : 3)
+                + " and you must rest for " + surface.restLength + "."
         ]
         property int tipIndex: Math.floor(Math.random() * tips.length)
 

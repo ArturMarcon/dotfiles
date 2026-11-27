@@ -1,0 +1,18 @@
+#%PAM-1.0
+# PAM service for the lock screen, read from this folder by LockScreen.qml.
+# Same checks as /etc/pam.d/system-auth, except pam_unix and pam_faillock get
+# `nodelay`: a wrong password answers at once instead of after a ~2 s pause.
+# pam_faillock still counts misses, so the hearts and lockouts are real.
+
+auth       required                    pam_faillock.so      preauth nodelay
+-auth      [success=2 default=ignore]  pam_systemd_home.so
+auth       [success=1 default=bad]     pam_unix.so          try_first_pass nullok nodelay
+auth       [default=die]               pam_faillock.so      authfail nodelay
+auth       optional                    pam_permit.so
+auth       required                    pam_env.so
+auth       required                    pam_faillock.so      authsucc nodelay
+
+-account   [success=1 default=ignore]  pam_systemd_home.so
+account    required                    pam_unix.so
+account    optional                    pam_permit.so
+account    required                    pam_time.so

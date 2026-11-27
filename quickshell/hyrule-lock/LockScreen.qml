@@ -18,16 +18,38 @@ Scope {
 
     signal damaged()
 
-    // Heart containers mirror pam_faillock (Arch defaults in /etc/security/faillock.conf):
-    // 3 failures within 15 minutes lock the account for 10 minutes.
-    readonly property int maxHearts: 3
-    readonly property int lockoutSeconds: 600
-    property int heartsLeft: maxHearts
-    property double lockedUntil: 0
+    // Heart containers mirror pam_faillock and read its limits from
+    // /etc/security/faillock.conf: `deny` wrong passwords within
+    // `fail_interval` lock the account for `unlock_time` seconds.
+    FileView {
+        id: faillockConf
+        path: "/etc/security/faillock.conf"
+        blockLoading: true
+    }
+
+    function confValue(key, fallback) {
+        var m = faillockConf.text().match(new RegExp("^\\s*" + key + "\\s*=\\s*(\\d+)", "m"));
+        return m ? parseInt(m[1]) : fallback;
+    }
+
+    readonly property int maxHearts: Math.max(1, confValue("deny", 3))
+    readonly property int lockoutSeconds: confValue("unlock_time", 600)
+    readonly property int failInterval: confValue("fail_interval", 900)
+
+    // Valid failures in the tally (epoch ms); hearts don't animate until it's first read
+    property var failureTimes: []
+    property bool tallyLoaded: false
     property double now: Date.now()
+
+    readonly property double latestFailure: failureTimes.length > 0 ? Math.max.apply(null, failureTimes) : 0
+    // Locked once `deny` failures fall within fail_interval of the newest one
+    readonly property bool tallyFull: failureTimes.filter(t => latestFailure - t < failInterval * 1000).length >= maxHearts
+    // The lock runs from the newest failure; one spare second as faillock keeps whole seconds
+    readonly property double lockedUntil: tallyFull ? latestFailure + (lockoutSeconds + 1) * 1000 : 0
     readonly property int lockoutRemaining: Math.max(0, Math.ceil((lockedUntil - now) / 1000))
-    // Once the lockout has passed, faillock allows another try before the old failures expire
-    readonly property int heartsShown: (heartsLeft === 0 && lockoutRemaining === 0) ? 1 : heartsLeft
+    // Once the lock expires, the next failure wipes the old tally, so every heart comes back
+    readonly property int heartsShown: lockoutRemaining > 0 ? 0
+        : (tallyFull ? maxHearts : Math.max(0, maxHearts - failureTimes.filter(t => now - t < failInterval * 1000).length))
 
     // Time of day
     property string timeStr: ""
@@ -63,22 +85,23 @@ Scope {
     }
 
     function parseFaillock(out) {
-        var valid = 0, latest = 0;
+        var times = [];
         out.split("\n").forEach(function (line) {
             var m = line.match(/^(\d{4}-\d\d-\d\d) (\d\d:\d\d:\d\d)\s.*\s([VI])\s*$/);
-            if (!m || m[3] !== "V") return;
-            valid++;
-            latest = Math.max(latest, new Date(m[1] + "T" + m[2]).getTime());
+            if (m && m[3] === "V") times.push(new Date(m[1] + "T" + m[2]).getTime());
         });
-        heartsLeft = Math.max(0, maxHearts - valid);
-        lockedUntil = valid >= maxHearts ? latest + lockoutSeconds * 1000 : 0;
+        failureTimes = times;
+        tallyLoaded = true;
     }
 
     Component.onCompleted: faillockProc.running = true
 
     // PAM Context for Wayland session authentication
+    // Own PAM service (pam/hyrule-lock): the system stack without the fail delay
     PamContext {
         id: pam
+        configDirectory: Quickshell.shellDir + "/pam"
+        config: "hyrule-lock"
         onPamMessage: (msg, isErr, respReq, respVis) => {
             if (respReq && root.pendingPassword !== "") {
                 pam.respond(root.pendingPassword);
@@ -94,6 +117,7 @@ Scope {
         onCompleted: (result) => {
             root.authenticating = false;
             if (result === PamResult.Success) {
+                root.failed = false;
                 root.unlocking = true;
                 unlockTimer.start();
             } else {
@@ -108,7 +132,6 @@ Scope {
 
     function submit() {
         if (unlocking || authenticating || buffer.length === 0 || lockoutRemaining > 0) return;
-        failed = false;
         authenticating = true;
         pendingPassword = buffer;
 
@@ -121,6 +144,11 @@ Scope {
     }
 
     function takeDamage() {
+        // Count the hit at once, the way faillock records it; the tally re-read confirms it
+        var t = Date.now();
+        now = t;
+        failureTimes = (tallyFull && lockoutRemaining === 0) ? [t]
+            : failureTimes.filter(x => t - x < failInterval * 1000).concat([t]);
         failed = true;
         buffer = "";
         damaged();
