@@ -9,11 +9,12 @@ Item {
     property color color: Theme.textPrimary
     property real size: Theme.iconSize
     property real weight: 2
+    property bool fadeColor: true
 
     implicitWidth: size
     implicitHeight: size
 
-    Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
+    Behavior on color { enabled: glyph.fadeColor; ColorAnimation { duration: Theme.animDurationFast } }
 
     readonly property var icons: ({
         "slate":       { s: "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M12 5.5l5 6.5-5 6.5-5-6.5z", f: "M10.4 12a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0-3.2 0" },
@@ -22,8 +23,12 @@ Item {
         "speaker":     { s: "M15.5 9a4 4 0 0 1 0 6 M18.2 6.3a7.8 7.8 0 0 1 0 11.4", f: "M3.5 9.2h3.8L12 5v14l-4.7-4.2H3.5z" },
         "speaker-low": { s: "M15.5 9a4 4 0 0 1 0 6", f: "M3.5 9.2h3.8L12 5v14l-4.7-4.2H3.5z" },
         "speaker-off": { s: "M15.5 9.5l5 5 M20.5 9.5l-5 5", f: "M3.5 9.2h3.8L12 5v14l-4.7-4.2H3.5z" },
+        // Output devices: a headband with a circlet gem, and a cabinet with a diamond tweeter
+        "headset":     { s: "M4.6 14.5V12a7.4 7.4 0 0 1 14.8 0v2.5", f: "M3 13.2h3.6v7H5.2A2.2 2.2 0 0 1 3 18z M17.4 13.2H21V18a2.2 2.2 0 0 1-2.2 2.2h-1.4z M12 2.4l1.7 2.2-1.7 2.2-1.7-2.2z" },
+        "stamina":     { s: "M9.5 3.5h5 M7.6 5.5h8.8a1.1 1.1 0 0 1 1.1 1.1v13.3a1.1 1.1 0 0 1-1.1 1.1H7.6a1.1 1.1 0 0 1-1.1-1.1V6.6a1.1 1.1 0 0 1 1.1-1.1z", f: "M12 9.2l2.5 3.5-2.5 3.5-2.5-3.5z" },
+        "speakers":    { s: "M6.2 2.8h11.6a1.7 1.7 0 0 1 1.7 1.7v15a1.7 1.7 0 0 1-1.7 1.7H6.2a1.7 1.7 0 0 1-1.7-1.7v-15a1.7 1.7 0 0 1 1.7-1.7z M7.8 14.6a4.2 4.2 0 1 0 8.4 0a4.2 4.2 0 1 0-8.4 0", f: "M10.7 14.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0 M12 5.2l1.5 1.9-1.5 1.9-1.5-1.9z" },
         "bolt":        { s: "", f: "M13.5 2L5 13.5h6L10 22l9-12.2h-6.2z" },
-        "power":       { s: "M12 3v8.5 M7 5.8A8 8 0 1 0 17 5.8", f: "" },
+        "power":       { s: "M12 3.5v8.5 M7 6.3A8 8 0 1 0 17 6.3", f: "" },
         "lock":        { s: "M5.5 11h13v9.5h-13z M8.5 11V8a3.5 3.5 0 0 1 7 0v3", f: "" },
         "campfire":    { s: "M4 20.5l16-3.5 M20 20.5L4 17", f: "M12 3c1 3.5 5 5.2 5 9.2a5 5 0 0 1-10 0c0-2 1-3.3 2-4.2 0 1.6.8 2.6 1.8 2.8C10.6 8.5 11 5.5 12 3z" },
         "blood-moon":  { s: "M12 2.5v1.5 M12 20v1.5 M2.5 12h1.5 M20 12h1.5", f: "M6 12a6 6 0 1 0 12 0a6 6 0 1 0-12 0" },

@@ -32,7 +32,7 @@ Item {
         Glyph {
             anchors.centerIn: parent
             name: "power"
-            size: 13
+            size: 14
             color: slot.hovered || powerRoot.popupOpen ? Theme.heartLight : Theme.hudText
         }
 

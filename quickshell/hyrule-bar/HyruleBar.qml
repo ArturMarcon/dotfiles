@@ -27,6 +27,9 @@ WlrLayershell {
         id: barRoot
         anchors.fill: parent
 
+        // Centre the HUD in the whole band above the windows, not just the bar
+        readonly property int midlineOffset: Math.round(Theme.windowGap / 2)
+
         // Portrait / narrow screens drop the media text and shorten the clock rules
         readonly property bool compact: width < 1400
 
@@ -44,20 +47,25 @@ WlrLayershell {
             anchors.left: parent.left
             anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: barRoot.midlineOffset
             spacing: 14
             layer.enabled: true
             layer.effect: HudShadow {}
 
+            // Every item centred on the bar's midline, whatever its height
             SlateLauncher {
                 id: launcher
+                anchors.verticalCenter: parent.verticalCenter
                 barWindow: barWindow
             }
 
             HeartsModule {
                 id: hearts
+                anchors.verticalCenter: parent.verticalCenter
             }
 
             WorkspacesModule {
+                anchors.verticalCenter: parent.verticalCenter
                 titleMaxWidth: Math.min(280, clock.x - 24 - leftSection.x
                                         - launcher.width - hearts.width - leftSection.spacing * 2
                                         - fixedWidth)
@@ -68,6 +76,7 @@ WlrLayershell {
         ClockModule {
             id: clock
             anchors.centerIn: parent
+            anchors.verticalCenterOffset: barRoot.midlineOffset
             barWindow: barWindow
             compact: barRoot.compact
             layer.enabled: true
@@ -80,21 +89,34 @@ WlrLayershell {
             anchors.right: parent.right
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: barRoot.midlineOffset
             spacing: 10
             layer.enabled: true
             layer.effect: HudShadow {}
 
             MediaModule {
+                anchors.verticalCenter: parent.verticalCenter
                 visible: hasMedia && !barRoot.compact
             }
 
-            AudioModule {}
+            OutputModule {
+                anchors.verticalCenter: parent.verticalCenter
+            }
 
-            StaminaModule {}
+            AudioModule {
+                anchors.verticalCenter: parent.verticalCenter
+            }
 
-            TrayModule {}
+            StaminaModule {
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            TrayModule {
+                anchors.verticalCenter: parent.verticalCenter
+            }
 
             PowerModule {
+                anchors.verticalCenter: parent.verticalCenter
                 barWindow: barWindow
             }
         }

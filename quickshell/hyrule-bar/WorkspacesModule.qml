@@ -36,18 +36,6 @@ Row {
                     Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
                 }
 
-                // Shown on another monitor: a small dot under the slot
-                Rectangle {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.bottom
-                    anchors.topMargin: 2
-                    width: 4
-                    height: 4
-                    radius: 2
-                    color: Theme.hudText
-                    visible: modelData.active && !modelData.focused
-                }
-
                 MouseArea {
                     anchors.fill: parent
                     onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + modelData.id + " })")

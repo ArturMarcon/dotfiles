@@ -38,6 +38,8 @@ QtObject {
     // Sheikah tech: blue when awake or selected (matches the cursor's clickable state)
     readonly property color sheikah: "#4fd2ff"
     readonly property color sheikahFill: "#d90a2733"
+    readonly property color ember: "#ff9a3d"          // Fire rod / Goron forge glow
+    readonly property color sound: "#b38cff"          // The game's sound meter
 
     // Pause-menu popups
     readonly property color menuFill: "#eb050e0c"
@@ -78,8 +80,12 @@ QtObject {
     readonly property int fontSizeLarge: 15
 
     readonly property int barHeight: 36
+    // Hyprland's outer gap (general.gaps_out in hypr/style-layout.lua): windows start
+    // this far below the bar, so the HUD centres itself in the bar plus this strip
+    readonly property int windowGap: 5
     readonly property int pillHeight: 26
     readonly property int slotSize: 24
+    readonly property int wheelSize: 26
     readonly property int cut: 5
     readonly property int iconSize: 15
 

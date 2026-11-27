@@ -2,8 +2,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 
-// Battery as the stamina wheel: green, flashing red when nearly spent.
-HudGauge {
+// Battery as the stamina wheel: green, amber when tiring, flashing red when
+// nearly spent, lime while charging.
+LitWheel {
     id: staminaRoot
     property var device: UPower.displayDevice
     property bool hasBattery: device !== null && device.isPresent
@@ -14,18 +15,18 @@ HudGauge {
     property bool isLow: pctNum <= 20 && !isCharging
 
     visible: hasBattery
-    implicitWidth: hasBattery ? 26 : 0
+    implicitWidth: hasBattery ? Theme.wheelSize : 0
 
-    value: pct
-    arcColor: {
+    accent: {
         if (isCharging) return Theme.sunlit;
         if (isLow) return Theme.crimson;
         if (pctNum <= 40) return Theme.amber;
         return Theme.stamina;
     }
-    trackColor: Theme.staminaTrack
-    glyph: isCharging ? "bolt" : ""
-    glyphColor: Theme.sunbeam
+    value: pct
+    glyph: isCharging ? "bolt" : "stamina"
     label: pctNum.toString()
     flashing: isLow
+
+    onClicked: flare()
 }

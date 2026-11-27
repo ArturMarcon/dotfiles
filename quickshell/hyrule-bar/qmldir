@@ -8,7 +8,7 @@ GlassPanel 1.0 GlassPanel.qml
 ItemSlot 1.0 ItemSlot.qml
 Rule 1.0 Rule.qml
 SheikahEye 1.0 SheikahEye.qml
-HudGauge 1.0 HudGauge.qml
+LitWheel 1.0 LitWheel.qml
 HudShadow 1.0 HudShadow.qml
 HeartContainer 1.0 HeartContainer.qml
 HeartsModule 1.0 HeartsModule.qml
@@ -26,3 +26,5 @@ StatCard 1.0 StatCard.qml
 SystemWidget 1.0 SystemWidget.qml
 CalendarWidget 1.0 CalendarWidget.qml
 DesktopWidgets 1.0 DesktopWidgets.qml
+OutputModule 1.0 OutputModule.qml
+VolumeSlider 1.0 VolumeSlider.qml
