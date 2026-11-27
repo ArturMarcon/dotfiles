@@ -54,6 +54,22 @@ QtObject {
     readonly property color popupFill: "#f70a2420"
     readonly property color popupStroke: "#a69aca68"
 
+    // Inventory (file manager), after the game's inventory screen: cream strips,
+    // dark glass slots, the gold frame on the selected item
+    readonly property color invCream: "#f3efe0"
+    readonly property color invCreamShade: "#d9d2b8"
+    readonly property color invInk: "#1d1c18"
+    readonly property color invInkSoft: "#4a473c"
+    readonly property color invTabFaded: "#c9c2a8"
+    readonly property color invBackdrop: "#8c060b09"
+    readonly property color invPanel: "#a6141713"
+    readonly property color invSlot: "#d90c0d0b"
+    readonly property color invSlotEmpty: "#73121411"
+    readonly property color invSlotBorder: "#33f3efe0"
+    readonly property color invSlotBorderEmpty: "#1cf3efe0"
+    readonly property color invGold: "#f6d36b"
+    readonly property color invRupee: "#3cc46e"
+
     // Desktop widgets: the menus' glass, quiet over the wallpaper, full strength on hover
     readonly property color widgetFill: "#cc050e0c"
     readonly property real widgetRestOpacity: 0.55

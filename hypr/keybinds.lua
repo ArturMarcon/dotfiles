@@ -2,7 +2,7 @@
 ------ KEYBINDINGS ------
 -------------------------
 local terminal = "kitty"
-local fileManager = "dolphin"
+local fileManager = "~/.config/quickshell/hyrule-bar/scripts/inventory-open.sh" -- the Inventory; falls back to dolphin
 local menu = "wofi --show drun"
 local shape_theme = "~/Desktop/shape-theme/theme-menu.sh"
 local shape_theme_fill = "~/Desktop/shape-theme/change-theme-menu-wallcrop.sh"

@@ -28,3 +28,16 @@ CalendarWidget 1.0 CalendarWidget.qml
 DesktopWidgets 1.0 DesktopWidgets.qml
 OutputModule 1.0 OutputModule.qml
 VolumeSlider 1.0 VolumeSlider.qml
+ItemArt 1.0 ItemArt.qml
+InvKeycap 1.0 InvKeycap.qml
+InvPrompt 1.0 InvPrompt.qml
+InvBand 1.0 InvBand.qml
+InvTabs 1.0 InvTabs.qml
+InvItemImage 1.0 InvItemImage.qml
+InvSlot 1.0 InvSlot.qml
+InvMenu 1.0 InvMenu.qml
+InvDialog 1.0 InvDialog.qml
+InvDetails 1.0 InvDetails.qml
+InventoryView 1.0 InventoryView.qml
+InventoryWindow 1.0 InventoryWindow.qml
+InvPicker 1.0 InvPicker.qml
